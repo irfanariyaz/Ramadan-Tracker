@@ -134,7 +134,7 @@ function MonthlyViewContent() {
                             <span>Good (20-39)</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-will this effered-500/20 border border-red-500/30 rounded"></div>
+                            <div className="w-3 h-3 bg-red-500/20 border border-red-500/30 rounded"></div>
                             <span>Needs Improvement (&lt;20)</span>
                         </div>
                     </div>

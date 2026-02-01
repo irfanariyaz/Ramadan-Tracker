@@ -38,8 +38,7 @@ ENV/
 # Database & Storage
 *.db
 *.sqlite3
-backend/static/photos/*
-!backend/static/photos/.gitkeep
+backend/static/photos/.gitkeep
 
 # OS
 .DS_Store

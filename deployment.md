@@ -52,12 +52,17 @@ Vercel is the best home for Next.js apps.
 
 ## 📸 Handling Photos in Production
 
-> [!NOTE]
-> On Render's Free tier, photos uploaded to `static/photos` will be deleted whenever the server restarts. 
+On Render's Free tier, the "local file system" is **ephemeral**. This means any photos uploaded via the app will be deleted whenever the server restarts or you redeploy.
 
-**For a 100% Free permanent solution:**
-- You can keep using it this way if you don't mind profile photos occasionally disappearing.
-- To make photos permanent, you would need to connect a service like **Cloudinary** (Free tier available).
+### Option A: Commit to GitHub (Best for your 5 images)
+Since you only have 5 images, the easiest 100% free way is:
+1. Put the images directly into `backend/static/photos/` on your computer.
+2. Add them to Git and push them to GitHub.
+3. Render will pull them as part of your code, and they will always be there.
+
+### Option B: Supabase Storage (Best if you want to upload via the app)
+Since you are already using **Supabase** for the database, you can use **Supabase Storage** for photos. It has a generous free tier (1GB) and photos will never disappear.
+
 
 ---
 
