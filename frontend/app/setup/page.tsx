@@ -13,7 +13,7 @@ export default function Setup() {
     const queryClient = useQueryClient();
     const [step, setStep] = useState<'family' | 'members'>('family');
     const [createdFamilyId, setCreatedFamilyId] = useState<number | null>(null);
-    const [createdMembers, setCreatedMembers] = useState<number[]>([]);
+    const [createdMembers, setCreatedMembers] = useState<{ id: number, name: string }[]>([]);
 
     const [familyData, setFamilyData] = useState({
         name: '',
@@ -40,7 +40,7 @@ export default function Setup() {
     const createMemberMutation = useMutation({
         mutationFn: memberAPI.create,
         onSuccess: (data) => {
-            setCreatedMembers([...createdMembers, data.id]);
+            setCreatedMembers([...createdMembers, { id: data.id, name: data.name }]);
             setMemberName('');
             queryClient.invalidateQueries({ queryKey: ['members'] });
         },
@@ -202,12 +202,12 @@ export default function Setup() {
                                 <h3 className="text-lg font-semibold text-ramadan-gold">
                                     Added Members ({createdMembers.length})
                                 </h3>
-                                {createdMembers.map((memberId, index) => (
-                                    <div key={memberId} className="bg-ramadan-navy/50 rounded-lg p-4">
+                                {createdMembers.map((member) => (
+                                    <div key={member.id} className="bg-ramadan-navy/50 rounded-lg p-4">
                                         <div className="flex items-center justify-between mb-4">
-                                            <span className="text-white font-medium">Member {index + 1}</span>
+                                            <span className="text-white font-medium">{member.name}</span>
                                         </div>
-                                        <PhotoUpload memberId={memberId} />
+                                        <PhotoUpload memberId={member.id} />
                                     </div>
                                 ))}
                             </div>

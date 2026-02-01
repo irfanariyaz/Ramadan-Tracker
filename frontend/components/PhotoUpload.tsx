@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Upload, User, X } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { memberAPI, API_BASE_URL } from '@/lib/api';
+import { memberAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
 import Image from 'next/image';
 
 interface PhotoUploadProps {
@@ -68,7 +68,8 @@ export default function PhotoUpload({ memberId, currentPhotoPath }: PhotoUploadP
         setIsDragging(false);
     };
 
-    const photoUrl = preview || (currentPhotoPath ? `${API_BASE_URL}/${currentPhotoPath.startsWith('/') ? currentPhotoPath.slice(1) : currentPhotoPath}` : null);
+    const normalizedPath = normalizePhotoPath(currentPhotoPath);
+    const photoUrl = preview || (normalizedPath ? `${API_BASE_URL}/${normalizedPath.startsWith('/') ? normalizedPath.slice(1) : normalizedPath}` : null);
 
     return (
         <div className="flex flex-col items-center gap-4">
