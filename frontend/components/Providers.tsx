@@ -30,7 +30,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 ))}
             </div>
 
-            <div className="relative z-10">
+            <div className="relative z-10 pt-16">
                 {children}
             </div>
         </QueryClientProvider>
