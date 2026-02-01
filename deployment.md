@@ -29,8 +29,9 @@ Supabase provides a permanent PostgreSQL database for free.
 2.  **Create a Web Service on Render**:
     - Connect your GitHub repo.
     - **Language**: `Python`
-    - **Build Command**: `pip install -r backend/requirements.txt`
-    - **Start Command**: `uvicorn main:app --app-dir backend --host 0.0.0.0 --port $PORT`
+    - **Root Directory**: `backend`
+    - **Build Command**: `pip install -r requirements.txt`
+    - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
 3.  **Configure Environment Variables**:
     - `DATABASE_URL`: Paste your **Supabase URI** here.
     - `CORS_ALLOWED_ORIGINS`: Your Vercel frontend URL (e.g., `https://my-ramadan-tracker.vercel.app`)
