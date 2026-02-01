@@ -168,7 +168,7 @@ export default function Setup() {
                         </div>
 
                         <form onSubmit={handleAddMember} className="mb-6">
-                            <div className="flex gap-2">
+                            <div className="flex flex-col md:flex-row gap-3">
                                 <input
                                     type="text"
                                     value={memberName}
@@ -176,21 +176,23 @@ export default function Setup() {
                                     placeholder="Member name"
                                     className="input-field flex-1"
                                 />
-                                <select
-                                    value={memberRole}
-                                    onChange={(e) => setMemberRole(e.target.value)}
-                                    className="input-field w-32"
-                                >
-                                    <option value="adult">Adult</option>
-                                    <option value="child">Child</option>
-                                </select>
-                                <button
-                                    type="submit"
-                                    disabled={createMemberMutation.isPending || !memberName}
-                                    className="btn-primary"
-                                >
-                                    {createMemberMutation.isPending ? 'Adding...' : 'Add'}
-                                </button>
+                                <div className="flex gap-3">
+                                    <select
+                                        value={memberRole}
+                                        onChange={(e) => setMemberRole(e.target.value)}
+                                        className="input-field flex-1 md:w-32"
+                                    >
+                                        <option value="adult">Adult</option>
+                                        <option value="child">Child</option>
+                                    </select>
+                                    <button
+                                        type="submit"
+                                        disabled={createMemberMutation.isPending || !memberName}
+                                        className="btn-primary min-w-[80px]"
+                                    >
+                                        {createMemberMutation.isPending ? 'Adding...' : 'Add'}
+                                    </button>
+                                </div>
                             </div>
                         </form>
 

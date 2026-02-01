@@ -242,33 +242,35 @@ function SettingsContent() {
                                     className="bg-ramadan-navy/30 border border-gray-700 rounded-lg p-4 flex items-center justify-between"
                                 >
                                     {editingMemberId === member.id ? (
-                                        <div className="flex-1 flex gap-3">
+                                        <div className="flex-1 flex flex-col md:flex-row gap-3">
                                             <input
                                                 type="text"
                                                 value={memberForm.name}
                                                 onChange={(e) => setMemberForm({ ...memberForm, name: e.target.value })}
                                                 className="input-field flex-1"
                                             />
-                                            <select
-                                                value={memberForm.role}
-                                                onChange={(e) => setMemberForm({ ...memberForm, role: e.target.value })}
-                                                className="input-field w-32"
-                                            >
-                                                <option value="adult">Adult</option>
-                                                <option value="child">Child</option>
-                                            </select>
-                                            <button
-                                                onClick={() => handleSaveMember(member.id)}
-                                                className="p-2 text-ramadan-teal hover:bg-ramadan-navy rounded-full"
-                                            >
-                                                <Save className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onClick={() => setEditingMemberId(null)}
-                                                className="p-2 text-red-400 hover:bg-ramadan-navy rounded-full"
-                                            >
-                                                <X className="w-5 h-5" />
-                                            </button>
+                                            <div className="flex gap-2 shrink-0">
+                                                <select
+                                                    value={memberForm.role}
+                                                    onChange={(e) => setMemberForm({ ...memberForm, role: e.target.value })}
+                                                    className="input-field flex-1 md:w-32"
+                                                >
+                                                    <option value="adult">Adult</option>
+                                                    <option value="child">Child</option>
+                                                </select>
+                                                <button
+                                                    onClick={() => handleSaveMember(member.id)}
+                                                    className="p-2 text-ramadan-teal hover:bg-ramadan-navy rounded-full"
+                                                >
+                                                    <Save className="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingMemberId(null)}
+                                                    className="p-2 text-red-400 hover:bg-ramadan-navy rounded-full"
+                                                >
+                                                    <X className="w-5 h-5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ) : (
                                         <>
@@ -298,7 +300,7 @@ function SettingsContent() {
                             {/* Add New Member Inline */}
                             <form
                                 onSubmit={handleAddMember}
-                                className="bg-ramadan-gold/5 border border-dashed border-ramadan-gold/30 rounded-lg p-4 flex gap-3"
+                                className="bg-ramadan-gold/5 border border-dashed border-ramadan-gold/30 rounded-lg p-4 flex flex-col md:flex-row gap-3"
                             >
                                 <input
                                     type="text"
@@ -307,21 +309,23 @@ function SettingsContent() {
                                     onChange={(e) => setNewMemberName(e.target.value)}
                                     className="input-field flex-1"
                                 />
-                                <select
-                                    value={newMemberRole}
-                                    onChange={(e) => setNewMemberRole(e.target.value)}
-                                    className="input-field w-32"
-                                >
-                                    <option value="adult">Adult</option>
-                                    <option value="child">Child</option>
-                                </select>
-                                <button
-                                    type="submit"
-                                    disabled={!newMemberName || addMemberMutation.isPending}
-                                    className="btn-primary"
-                                >
-                                    Add
-                                </button>
+                                <div className="flex gap-3">
+                                    <select
+                                        value={newMemberRole}
+                                        onChange={(e) => setNewMemberRole(e.target.value)}
+                                        className="input-field flex-1 md:w-32"
+                                    >
+                                        <option value="adult">Adult</option>
+                                        <option value="child">Child</option>
+                                    </select>
+                                    <button
+                                        type="submit"
+                                        disabled={!newMemberName || addMemberMutation.isPending}
+                                        className="btn-primary min-w-[80px]"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </section>
