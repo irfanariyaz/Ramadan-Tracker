@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -15,7 +15,7 @@ interface MemberDailyScore {
     fasting_status: string;
 }
 
-export default function MonthlyView() {
+function MonthlyViewContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const familyId = searchParams.get('familyId');
@@ -134,12 +134,20 @@ export default function MonthlyView() {
                             <span>Good (20-39)</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-red-500/20 border border-red-500/30 rounded"></div>
+                            <div className="w-3 h-3 bg-will this effered-500/20 border border-red-500/30 rounded"></div>
                             <span>Needs Improvement (&lt;20)</span>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function MonthlyView() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-ramadan-gold">Loading monthly view...</div>}>
+            <MonthlyViewContent />
+        </Suspense>
     );
 }

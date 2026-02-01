@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Settings, Trash2, Edit2, Save, X, UserPlus, Users } from 'lucide-react';
 import { familyAPI, memberAPI } from '@/lib/api';
 import Link from 'next/link';
 
-export default function SettingsPage() {
+function SettingsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const familyId = searchParams.get('familyId');
@@ -328,5 +328,13 @@ export default function SettingsPage() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function SettingsPage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-ramadan-gold">Loading settings...</div>}>
+            <SettingsContent />
+        </Suspense>
     );
 }

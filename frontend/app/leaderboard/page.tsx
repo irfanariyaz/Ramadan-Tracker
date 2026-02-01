@@ -1,12 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Trophy, Flame, BookOpen, Star } from 'lucide-react';
 import { progressAPI, API_BASE_URL } from '@/lib/api';
 import Image from 'next/image';
 
-export default function Leaderboard() {
+function LeaderboardContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const familyId = searchParams.get('familyId');
@@ -99,5 +100,13 @@ export default function Leaderboard() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function Leaderboard() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-ramadan-gold">Loading leaderboard...</div>}>
+            <LeaderboardContent />
+        </Suspense>
     );
 }
