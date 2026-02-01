@@ -3,8 +3,8 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Settings, Trash2, Edit2, Save, X, UserPlus, Users } from 'lucide-react';
-import { familyAPI, memberAPI } from '@/lib/api';
+import { ArrowLeft, Settings, Trash2, Edit2, Save, X, UserPlus, Users, Camera } from 'lucide-react';
+import { familyAPI, memberAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
 import Link from 'next/link';
 
 function SettingsContent() {
@@ -115,6 +115,18 @@ function SettingsContent() {
                 name: newMemberName,
                 role: newMemberRole,
             });
+        }
+    };
+
+    const handlePhotoUpload = async (memberId: number, file: File) => {
+        try {
+            await memberAPI.uploadPhoto(memberId, file);
+            queryClient.invalidateQueries({ queryKey: ['members', familyId] });
+            queryClient.invalidateQueries({ queryKey: ['family', familyId] });
+            queryClient.invalidateQueries({ queryKey: ['leaderboard', familyId] });
+        } catch (error) {
+            console.error('Failed to upload photo:', error);
+            alert('Failed to upload photo. Please try again.');
         }
     };
 
@@ -289,9 +301,43 @@ function SettingsContent() {
                                         </div>
                                     ) : (
                                         <>
-                                            <div>
-                                                <p className="font-bold text-white">{member.name}</p>
-                                                <p className="text-xs text-gray-400 uppercase tracking-wider">{member.role}</p>
+                                            <div className="flex items-center gap-4">
+                                                <div className="relative group">
+                                                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-ramadan-gold/30 bg-ramadan-navy flex items-center justify-center">
+                                                        {member.photo_path ? (
+                                                            <img
+                                                                src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)}`}
+                                                                alt={member.name}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1a2b4b&color=D4AF37`;
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="text-ramadan-gold font-bold text-lg">
+                                                                {member.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <label className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Camera className="w-5 h-5 text-white" />
+                                                        <input
+                                                            type="file"
+                                                            className="hidden"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    handlePhotoUpload(member.id, file);
+                                                                }
+                                                            }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-white">{member.name}</p>
+                                                    <p className="text-xs text-gray-400 uppercase tracking-wider">{member.role}</p>
+                                                </div>
                                             </div>
                                             <div className="flex gap-2">
                                                 <button
