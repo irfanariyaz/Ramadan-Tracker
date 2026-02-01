@@ -8,6 +8,11 @@ const nextConfig = {
                 port: '8000',
                 pathname: '/static/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'ramadan-tracker.onrender.com',
+                pathname: '/static/**',
+            },
         ],
     },
 };

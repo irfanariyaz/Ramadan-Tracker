@@ -17,8 +17,10 @@ Supabase provides a permanent PostgreSQL database for free.
 1.  Go to [Supabase.com](https://supabase.com/) and create a free account.
 2.  Create a **New Project**.
 3.  Go to **Project Settings** -> **Database**.
-4.  Find the **Connection string** section. 
-5.  Copy the **URI** (it looks like `postgresql://postgres:[YOUR-PASSWORD]@db.xxxx.supabase.co:5432/postgres`).
+4.  Find the **Connection string** section and select **URI**.
+5.  **CRITICAL**: Change the "Method" from **Direct connection** to **Session Pooler**.
+    - Render does not support IPv6, and Supabase's direct connection is IPv6-only. The Pooler provides an IPv4 address that Render can use.
+6.  Copy the **URI**.
     - *Replace `[YOUR-PASSWORD]` with the password you set when creating the project.*
 
 ---
@@ -46,7 +48,7 @@ Vercel is the best home for Next.js apps.
     - Import your GitHub repo.
     - Set the **Root Directory** to `frontend`.
 2.  **Configure Environment Variables**:
-    - `NEXT_PUBLIC_API_URL`: Your Render backend URL (e.g., `https://ramadan-api.onrender.com`)
+    - `NEXT_PUBLIC_API_URL`: Your Render backend URL (e.g., `https://ramadan-api.onrender.com`). **Note**: Ensure there is no trailing slash at the end.
 3.  **Deploy**: Click "Deploy" and Vercel will handle the rest.
 
 ---

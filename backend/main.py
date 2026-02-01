@@ -2,7 +2,6 @@ from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from datetime import date, datetime
 from datetime import date, datetime, timedelta
 from typing import List
 import os
@@ -30,12 +29,20 @@ os.makedirs(PHOTO_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # CORS middleware
-allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001").split(",")
+# Cleanly split origins and strip whitespace
+raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
+allow_credentials = True
+
+if raw_origins == "*":
+    allowed_origins = ["*"]
+    allow_credentials = False  # Starlette requires this to be False if origins is "*"
+else:
+    allowed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
