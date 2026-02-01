@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-ramadan-gradient text-white min-h-screen;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-card-gradient backdrop-blur-sm rounded-2xl p-6 shadow-glow border border-ramadan-gold/20;
+  }
+  
+  .btn-primary {
+    @apply bg-gold-gradient text-ramadan-dark font-semibold px-6 py-3 rounded-lg shadow-glow hover:shadow-glow-strong transition-all duration-300 hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-ramadan-blue/50 backdrop-blur-sm text-white font-semibold px-6 py-3 rounded-lg border border-ramadan-gold/30 hover:bg-ramadan-blue/70 transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply bg-ramadan-navy/50 backdrop-blur-sm border border-ramadan-gold/30 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ramadan-gold/50 transition-all;
+  }
+  
+  .checkbox-custom {
+    @apply w-6 h-6 rounded border-2 border-ramadan-gold/50 bg-ramadan-navy/50 checked:bg-gold-gradient checked:border-ramadan-gold cursor-pointer transition-all;
+  }
+}
+
+/* Star decorations */
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
