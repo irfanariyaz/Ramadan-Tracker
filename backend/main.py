@@ -89,12 +89,19 @@ def update_family(family_id: int, family: schemas.FamilyUpdate, db: Session = De
 
 @app.delete("/api/families/{family_id}")
 def delete_family(family_id: int, db: Session = Depends(get_db)):
-    """Delete a family and all its members"""
+    """Delete a family and all its members, including their photo files"""
     db_family = crud.get_family(db, family_id)
     if not db_family:
         raise HTTPException(status_code=404, detail="Family not found")
+    
+    # Clean up all members' photos before deleting the family
+    members = crud.get_family_members(db, family_id)
+    for member in members:
+        if member.photo_path:
+            file_upload.delete_file(member.photo_path)
+            
     crud.delete_family(db, family_id)
-    return {"message": "Family deleted successfully"}
+    return {"message": "Family and all associated photos deleted successfully"}
 
 
 # Family Member Endpoints
@@ -134,12 +141,17 @@ def update_member(member_id: int, member: schemas.MemberUpdate, db: Session = De
 
 @app.delete("/api/members/{member_id}")
 def delete_member(member_id: int, db: Session = Depends(get_db)):
-    """Delete a family member"""
+    """Delete a family member and their photo file"""
     db_member = crud.get_member(db, member_id)
     if not db_member:
         raise HTTPException(status_code=404, detail="Member not found")
+    
+    # Delete photo file if exists
+    if db_member.photo_path:
+        file_upload.delete_file(db_member.photo_path)
+        
     crud.delete_member(db, member_id)
-    return {"message": "Member deleted successfully"}
+    return {"message": "Member and photo deleted successfully"}
 
 
 @app.post("/api/members/{member_id}/photo")

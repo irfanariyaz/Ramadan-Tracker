@@ -54,10 +54,18 @@ async def save_upload_file(upload_file: UploadFile) -> str:
     return f"static/photos/{unique_filename}"
 
 
-def delete_file(file_path: str):
+def delete_file(photo_path: str):
     """Delete a file if it exists"""
+    if not photo_path:
+        return
+        
+    # extract filename from path like "static/photos/filename.jpg"
+    filename = os.path.basename(photo_path)
+    full_path = UPLOAD_DIR / filename
+    
     try:
-        if file_path and os.path.exists(file_path):
-            os.remove(file_path)
+        if full_path.exists():
+            os.remove(full_path)
+            print(f"Successfully deleted photo: {full_path}")
     except Exception as e:
-        print(f"Error deleting file {file_path}: {e}")
+        print(f"Error deleting file {full_path}: {e}")
