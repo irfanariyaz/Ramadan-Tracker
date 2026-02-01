@@ -3,15 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, Circle, BookOpen, Target, Star } from 'lucide-react';
-import { dailyEntryAPI, customItemAPI } from '@/lib/api';
+import { dailyEntryAPI, customItemAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
 import CircularProgress from './CircularProgress';
+import Image from 'next/image';
 
 interface DailyChecklistProps {
     memberId: number;
+    memberName: string;
+    memberPhoto?: string | null;
     selectedDate: string;
 }
 
-export default function DailyChecklist({ memberId, selectedDate }: DailyChecklistProps) {
+export default function DailyChecklist({ memberId, memberName, memberPhoto, selectedDate }: DailyChecklistProps) {
     const queryClient = useQueryClient();
 
     const [formData, setFormData] = useState({
@@ -96,10 +99,35 @@ export default function DailyChecklist({ memberId, selectedDate }: DailyChecklis
 
     return (
         <div className="card animate-slide-up">
-            <h2 className="text-2xl font-bold mb-6 text-ramadan-gold flex items-center gap-2">
-                <CheckCircle2 className="w-6 h-6" />
-                Daily Checklist
-            </h2>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-ramadan-gold/20">
+                <div className="flex items-center gap-4">
+                    {memberPhoto ? (
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-ramadan-gold">
+                            <Image
+                                src={`${API_BASE_URL}/${normalizePhotoPath(memberPhoto)?.startsWith('/') ? normalizePhotoPath(memberPhoto)?.slice(1) : normalizePhotoPath(memberPhoto)}`}
+                                alt={memberName}
+                                fill
+                                sizes="64px"
+                                className="object-cover"
+                            />
+                        </div>
+                    ) : (
+                        <div className="w-16 h-16 rounded-full bg-ramadan-navy/50 border-2 border-ramadan-gold/30 flex items-center justify-center">
+                            <Star className="w-8 h-8 text-ramadan-gold/50" />
+                        </div>
+                    )}
+                    <div>
+                        <h2 className="text-2xl font-bold text-ramadan-gold">
+                            {memberName}'s Checklist
+                        </h2>
+                        <p className="text-gray-400 text-sm">Tracking for {new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2 text-ramadan-teal bg-ramadan-teal/10 px-4 py-2 rounded-full border border-ramadan-teal/20">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="font-bold">{Math.round((completedPrayers / 6) * 100)}% Prayers Done</span>
+                </div>
+            </div>
 
             {/* Fasting Status */}
             <div className="mb-6">

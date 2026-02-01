@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Moon, Users, Calendar, Settings, UserPlus } from 'lucide-react';
-import { familyAPI, memberAPI, API_BASE_URL } from '@/lib/api';
+import { familyAPI, memberAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
 import DailyChecklist from '@/components/DailyChecklist';
 import IftarCountdown from '@/components/IftarCountdown';
 import PrayerTimes from '@/components/PrayerTimes';
@@ -146,6 +146,31 @@ export default function Home() {
                     <div className="grid lg:grid-cols-3 gap-6">
                         {/* Left Column - Prayer Times & Countdown */}
                         <div className="space-y-6">
+                            {/* Selected Member Info card for desktop */}
+                            <div className="card hidden lg:block bg-gold-gradient text-ramadan-dark">
+                                <div className="flex items-center gap-4">
+                                    {members?.find(m => m.id === selectedMemberId)?.photo_path ? (
+                                        <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-ramadan-dark/20">
+                                            <Image
+                                                src={`${API_BASE_URL}/${normalizePhotoPath(members.find(m => m.id === selectedMemberId).photo_path)?.startsWith('/') ? normalizePhotoPath(members.find(m => m.id === selectedMemberId).photo_path)?.slice(1) : normalizePhotoPath(members.find(m => m.id === selectedMemberId).photo_path)}`}
+                                                alt="Selected"
+                                                fill
+                                                sizes="48px"
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-12 h-12 rounded-full bg-ramadan-dark/10 flex items-center justify-center border-2 border-ramadan-dark/20">
+                                            <Users className="w-6 h-6 text-ramadan-dark/50" />
+                                        </div>
+                                    )}
+                                    <div>
+                                        <div className="text-xs font-bold uppercase tracking-wider opacity-70">Active Tracker</div>
+                                        <div className="text-lg font-bold">{members?.find(m => m.id === selectedMemberId)?.name}</div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Custom Items Manager */}
                             {showCustomItems && (
                                 <CustomItemsManager memberId={selectedMemberId} />
@@ -156,7 +181,12 @@ export default function Home() {
 
                         {/* Middle & Right Columns - Daily Checklist */}
                         <div className="lg:col-span-2">
-                            <DailyChecklist memberId={selectedMemberId} selectedDate={selectedDate} />
+                            <DailyChecklist
+                                memberId={selectedMemberId}
+                                memberName={members?.find(m => m.id === selectedMemberId)?.name || ''}
+                                memberPhoto={members?.find(m => m.id === selectedMemberId)?.photo_path}
+                                selectedDate={selectedDate}
+                            />
                         </div>
                     </div>
                 )}
@@ -180,7 +210,7 @@ export default function Home() {
                                     <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-transparent group-hover:border-ramadan-gold bg-ramadan-navy/50 flex items-center justify-center transition-all shadow-lg group-hover:shadow-glow-gold">
                                         {member.photo_path ? (
                                             <Image
-                                                src={`${API_BASE_URL}/${member.photo_path.startsWith('/') ? member.photo_path.slice(1) : member.photo_path}`}
+                                                src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)?.startsWith('/') ? normalizePhotoPath(member.photo_path)?.slice(1) : normalizePhotoPath(member.photo_path)}`}
                                                 alt={member.name}
                                                 fill
                                                 sizes="96px"

@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Users, ArrowLeft, Trophy, BookOpen, Utensils, Calendar, Settings } from 'lucide-react';
-import { progressAPI, API_BASE_URL } from '@/lib/api';
+import { familyAPI, progressAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import CircularProgress from '@/components/CircularProgress';
@@ -107,12 +107,12 @@ function DashboardContent() {
                                 {/* Member Header */}
                                 <div className="flex items-center gap-4 mb-6">
                                     {member.photo_path ? (
-                                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-ramadan-gold">
+                                        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-ramadan-gold shrink-0">
                                             <Image
-                                                src={`${API_BASE_URL}/${member.photo_path.startsWith('/') ? member.photo_path.slice(1) : member.photo_path}`}
+                                                src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)?.startsWith('/') ? normalizePhotoPath(member.photo_path)?.slice(1) : normalizePhotoPath(member.photo_path)}`}
                                                 alt={member.member_name}
                                                 fill
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                sizes="(max-width: 768px) 64px, 80px"
                                                 className="object-cover"
                                             />
                                         </div>

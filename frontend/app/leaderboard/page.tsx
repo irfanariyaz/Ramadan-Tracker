@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Trophy, Flame, BookOpen, Star } from 'lucide-react';
-import { progressAPI, API_BASE_URL } from '@/lib/api';
+import { familyAPI, progressAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
 import Image from 'next/image';
 
 function LeaderboardContent() {
@@ -58,9 +58,10 @@ function LeaderboardContent() {
                             <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-ramadan-gold/50 mr-4">
                                 {entry.photo_path ? (
                                     <Image
-                                        src={`${API_BASE_URL}/${entry.photo_path.startsWith('/') ? entry.photo_path.slice(1) : entry.photo_path}`}
+                                        src={`${API_BASE_URL}/${normalizePhotoPath(entry.photo_path)?.startsWith('/') ? normalizePhotoPath(entry.photo_path)?.slice(1) : normalizePhotoPath(entry.photo_path)}`}
                                         alt={entry.member_name}
                                         fill
+                                        sizes="48px"
                                         className="object-cover"
                                     />
                                 ) : (

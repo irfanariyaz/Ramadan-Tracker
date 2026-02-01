@@ -1,4 +1,10 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
+// Utility to normalize photo paths (fixes legacy typos like "photo s" -> "photos")
+export const normalizePhotoPath = (path: string | null | undefined): string | null => {
+    if (!path) return null;
+    return path.replace('static/photo s/', 'static/photos/');
+};
 
 export async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;

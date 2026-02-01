@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List, Dict
 from datetime import date, datetime
 
@@ -55,6 +55,13 @@ class MemberResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+    @field_validator('photo_path', mode='after')
+    @classmethod
+    def normalize_photo_path(cls, v: Optional[str]) -> Optional[str]:
+        if v and 'static/photo s/' in v:
+            return v.replace('static/photo s/', 'static/photos/')
+        return v
 
 
 # Custom Checklist Item Schemas
@@ -157,6 +164,16 @@ class MemberProgress(BaseModel):
     custom_items_completed: int = 0
     custom_items_total: int = 0
 
+    class Config:
+        from_attributes = True
+
+    @field_validator('photo_path', mode='after')
+    @classmethod
+    def normalize_photo_path(cls, v: Optional[str]) -> Optional[str]:
+        if v and 'static/photo s/' in v:
+            return v.replace('static/photo s/', 'static/photos/')
+        return v
+
 
 class FamilyProgressResponse(BaseModel):
     family_id: int
@@ -196,6 +213,13 @@ class LeaderboardEntry(BaseModel):
     fasting_streak: int
     fasting_total: int
     quran_pages_total: int
+
+    @field_validator('photo_path', mode='after')
+    @classmethod
+    def normalize_photo_path(cls, v: Optional[str]) -> Optional[str]:
+        if v and 'static/photo s/' in v:
+            return v.replace('static/photo s/', 'static/photos/')
+        return v
 
 
 class LeaderboardResponse(BaseModel):
