@@ -31,10 +31,22 @@ export default function Home() {
         enabled: !!selectedFamilyId,
     });
 
-    // Auto-select first family if available
+    // Auto-select first family if available, and validate selection
     useEffect(() => {
-        if (families && families.length > 0 && !selectedFamilyId) {
-            setSelectedFamilyId(families[0].id);
+        if (families && families.length > 0) {
+            if (!selectedFamilyId) {
+                setSelectedFamilyId(families[0].id);
+            } else {
+                // Check if currently selected family still exists
+                const familyExists = families.some(f => f.id === selectedFamilyId);
+                if (!familyExists) {
+                    setSelectedFamilyId(families[0].id);
+                    setSelectedMemberId(null);
+                }
+            }
+        } else if (families && families.length === 0) {
+            setSelectedFamilyId(null);
+            setSelectedMemberId(null);
         }
     }, [families, selectedFamilyId]);
 

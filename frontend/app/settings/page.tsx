@@ -43,6 +43,7 @@ function SettingsContent() {
     const deleteFamilyMutation = useMutation({
         mutationFn: () => familyAPI.delete(Number(familyId)),
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['families'] });
             router.push('/');
         },
     });
@@ -117,15 +118,29 @@ function SettingsContent() {
         }
     };
 
-    if (familyLoading || membersLoading) {
+    if (familyLoading || membersLoading || deleteFamilyMutation.isSuccess) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center text-ramadan-gold">Loading settings...</div>
+                <div className="text-center text-ramadan-gold">
+                    {deleteFamilyMutation.isSuccess ? 'Redirecting...' : 'Loading settings...'}
+                </div>
             </div>
         );
     }
 
-    if (!family) return <div className="p-8 text-center text-red-400">Family not found</div>;
+    if (!family) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center">
+                <div className="text-red-400 mb-4 text-xl font-bold">Family not found</div>
+                <button
+                    onClick={() => router.push('/')}
+                    className="btn-primary"
+                >
+                    Return to home
+                </button>
+            </div>
+        );
+    }
 
     return (
         <main className="min-h-screen p-4 md:p-8">
