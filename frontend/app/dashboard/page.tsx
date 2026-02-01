@@ -31,7 +31,11 @@ interface FamilyProgressResponse {
 function DashboardContent() {
     const searchParams = useSearchParams();
     const familyId = searchParams.get('familyId');
-    const today = new Date().toISOString().split('T')[0];
+    const getTodayLocal = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    const today = getTodayLocal();
 
     const { data: familyProgress, isLoading } = useQuery<FamilyProgressResponse | null>({
         queryKey: ['familyProgress', familyId, today],

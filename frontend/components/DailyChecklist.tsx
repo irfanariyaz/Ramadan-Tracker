@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, Circle, BookOpen, Target, Star } from 'lucide-react';
-import { dailyEntryAPI, customItemAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
+import { CheckCircle2, Circle, BookOpen, Target, Star, Plus, Minus } from 'lucide-react';
+import { dailyEntryAPI, customItemAPI, API_BASE_URL, normalizePhotoPath, formatDate } from '@/lib/api';
 import CircularProgress from './CircularProgress';
 import Image from 'next/image';
 
@@ -120,7 +120,7 @@ export default function DailyChecklist({ memberId, memberName, memberPhoto, sele
                         <h2 className="text-2xl font-bold text-ramadan-gold">
                             {memberName}'s Checklist
                         </h2>
-                        <p className="text-gray-400 text-sm">Tracking for {new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                        <p className="text-gray-400 text-sm">Tracking for {formatDate(selectedDate)}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 text-ramadan-teal bg-ramadan-teal/10 px-4 py-2 rounded-full border border-ramadan-teal/20">
@@ -188,47 +188,91 @@ export default function DailyChecklist({ memberId, memberName, memberPhoto, sele
 
             {/* Quran Progress */}
             <div className="mb-6">
-                <label className="block text-sm font-medium mb-3 text-ramadan-gold-light flex items-center gap-2">
+                <label className="block text-sm font-medium mb-4 text-ramadan-gold-light flex items-center gap-2">
                     <BookOpen className="w-4 h-4" />
                     Quran Progress
                 </label>
-                <div className="grid md:grid-cols-2 gap-6">
-                    <div>
+                <div className="grid lg:grid-cols-2 gap-8 bg-ramadan-navy/30 p-6 rounded-xl border border-ramadan-gold/10">
+                    {/* Juz Section */}
+                    <div className="flex flex-col items-center">
                         <CircularProgress
                             value={formData.quran_juz}
                             max={30}
                             label="Juz"
                             color="gold"
                         />
-                        <input
-                            type="range"
-                            min="0"
-                            max="30"
-                            value={formData.quran_juz}
-                            onChange={(e) => handleUpdate('quran_juz', Number(e.target.value))}
-                            className="w-full mt-4"
-                        />
-                        <div className="text-center mt-2 text-sm text-gray-300">
-                            Juz {formData.quran_juz} of 30
+                        <div className="mt-6 w-full flex flex-col items-center gap-4">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => handleUpdate('quran_juz', Math.max(0, formData.quran_juz - 1))}
+                                    className="p-2 bg-ramadan-navy rounded-lg border border-ramadan-gold/20 text-ramadan-gold hover:bg-ramadan-gold/10"
+                                >
+                                    <Minus className="w-5 h-5" />
+                                </button>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="30"
+                                    value={formData.quran_juz}
+                                    onChange={(e) => handleUpdate('quran_juz', Math.min(30, Math.max(0, Number(e.target.value))))}
+                                    className="w-20 text-center bg-ramadan-dark border-2 border-ramadan-gold/30 rounded-lg py-2 text-xl font-bold text-ramadan-gold focus:border-ramadan-gold outline-none"
+                                />
+                                <button
+                                    onClick={() => handleUpdate('quran_juz', Math.min(30, formData.quran_juz + 1))}
+                                    className="p-2 bg-ramadan-navy rounded-lg border border-ramadan-gold/20 text-ramadan-gold hover:bg-ramadan-gold/10"
+                                >
+                                    <Plus className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Total Juz: 30</div>
                         </div>
                     </div>
-                    <div>
+
+                    {/* Page Section */}
+                    <div className="flex flex-col items-center">
                         <CircularProgress
                             value={formData.quran_page}
                             max={604}
                             label="Pages"
                             color="teal"
                         />
-                        <input
-                            type="range"
-                            min="0"
-                            max="604"
-                            value={formData.quran_page}
-                            onChange={(e) => handleUpdate('quran_page', Number(e.target.value))}
-                            className="w-full mt-4"
-                        />
-                        <div className="text-center mt-2 text-sm text-gray-300">
-                            Page {formData.quran_page} of 604
+                        <div className="mt-6 w-full flex flex-col items-center gap-4">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => handleUpdate('quran_page', Math.max(0, formData.quran_page - 1))}
+                                    className="p-2 bg-ramadan-navy rounded-lg border border-ramadan-teal/20 text-ramadan-teal hover:bg-ramadan-teal/10"
+                                >
+                                    <Minus className="w-5 h-5" />
+                                </button>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="604"
+                                    value={formData.quran_page}
+                                    onChange={(e) => handleUpdate('quran_page', Math.min(604, Math.max(0, Number(e.target.value))))}
+                                    className="w-24 text-center bg-ramadan-dark border-2 border-ramadan-teal/30 rounded-lg py-2 text-xl font-bold text-ramadan-teal focus:border-ramadan-teal outline-none"
+                                />
+                                <button
+                                    onClick={() => handleUpdate('quran_page', Math.min(604, formData.quran_page + 1))}
+                                    className="p-2 bg-ramadan-navy rounded-lg border border-ramadan-teal/20 text-ramadan-teal hover:bg-ramadan-teal/10"
+                                >
+                                    <Plus className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            {/* Quick Add Page Buttons */}
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {[1, 5, 10].map(val => (
+                                    <button
+                                        key={val}
+                                        onClick={() => handleUpdate('quran_page', Math.min(604, formData.quran_page + val))}
+                                        className="px-3 py-1 bg-ramadan-teal/10 text-ramadan-teal border border-ramadan-teal/30 rounded-full text-xs font-bold hover:bg-ramadan-teal/20 transition-all"
+                                    >
+                                        +{val}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Total Pages: 604</div>
                         </div>
                     </div>
                 </div>

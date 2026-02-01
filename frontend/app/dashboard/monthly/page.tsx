@@ -102,7 +102,7 @@ function MonthlyViewContent() {
                             >
                                 <div className="flex justify-between items-start mb-2">
                                     <span className="text-sm font-bold text-gray-400">
-                                        {new Date(dayStat.date).getDate()}
+                                        {dayStat.date.split('-')[2].replace(/^0/, '')}
                                     </span>
                                     <span className="text-xs text-gray-500">
                                         {dayStat.fasting_count} fasting

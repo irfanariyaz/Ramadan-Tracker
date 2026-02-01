@@ -6,6 +6,15 @@ export const normalizePhotoPath = (path: string | null | undefined): string | nu
     return path.replace('static/photo s/', 'static/photos/');
 };
 
+export const formatDate = (dateStr: string): string => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+};
+
 export async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     console.log(`Making API request to: ${url}`);

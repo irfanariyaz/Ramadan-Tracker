@@ -14,7 +14,12 @@ import Image from 'next/image';
 export default function Home() {
     const [selectedFamilyId, setSelectedFamilyId] = useState<number | null>(null);
     const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
-    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    const getTodayLocal = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
+    const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
     const [showCustomItems, setShowCustomItems] = useState(false);
     const queryClient = useQueryClient();
 
@@ -126,7 +131,7 @@ export default function Home() {
                                 type="date"
                                 value={selectedDate}
                                 onChange={(e) => setSelectedDate(e.target.value)}
-                                max={new Date().toISOString().split('T')[0]}
+                                max={getTodayLocal()}
                                 className="input-field w-full md:w-auto"
                             />
                         </div>
