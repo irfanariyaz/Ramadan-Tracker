@@ -81,11 +81,11 @@ function LeaderboardContent() {
                                     )}
                                 </h3>
                                 <div className="text-sm text-gray-400 flex gap-4 mt-1">
-                                    <span className="flex items-center gap-1" title="Fasting Streak">
-                                        <Flame className="w-3 h-3 text-orange-400" /> {entry.fasting_streak} Day Streak
+                                    <span className="flex items-center gap-1" title="Reading Streak">
+                                        <Flame className="w-3 h-3 text-orange-400" /> {entry.quran_streak} Day Reading Streak
                                     </span>
-                                    <span className="flex items-center gap-1" title="Quran Pages">
-                                        <BookOpen className="w-3 h-3 text-blue-400" /> {entry.quran_pages_total} Pages
+                                    <span className="flex items-center gap-1" title="Progress">
+                                        <BookOpen className="w-3 h-3 text-blue-400" /> {entry.quran_pages_total} Pages • {entry.fasting_total} Fasts
                                     </span>
                                 </div>
                             </div>

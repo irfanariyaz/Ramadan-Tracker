@@ -72,9 +72,24 @@ export default function DailyChecklist({ memberId, memberName, memberPhoto, sele
     });
 
     const handleUpdate = (field: string, value: any) => {
-        const newData = { ...formData, [field]: value };
+        let newData = { ...formData, [field]: value };
+        let mutationData: any = { [field]: value };
+
+        // Sync logic for Quran progress
+        if (field === 'quran_page') {
+            const page = Number(value);
+            const juz = page === 0 ? 0 : Math.min(30, Math.floor((page - 1) / 20) + 1);
+            newData = { ...newData, quran_juz: juz };
+            mutationData = { quran_page: page, quran_juz: juz };
+        } else if (field === 'quran_juz') {
+            const juz = Number(value);
+            const page = juz === 0 ? 0 : (juz - 1) * 20 + 1;
+            newData = { ...newData, quran_page: page };
+            mutationData = { quran_juz: juz, quran_page: page };
+        }
+
         setFormData(newData);
-        updateMutation.mutate({ [field]: value });
+        updateMutation.mutate(mutationData);
     };
 
     const handleCustomItemToggle = (itemId: string) => {
@@ -188,9 +203,16 @@ export default function DailyChecklist({ memberId, memberName, memberPhoto, sele
 
             {/* Quran Progress */}
             <div className="mb-6">
-                <label className="block text-sm font-medium mb-4 text-ramadan-gold-light flex items-center gap-2">
-                    <BookOpen className="w-4 h-4" />
-                    Quran Progress
+                <label className="block text-sm font-medium mb-4 text-ramadan-gold-light flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-2">
+                        <BookOpen className="w-4 h-4" />
+                        Quran Progress
+                    </span>
+                    {dailyStats && (dailyStats.current_max_quran_page > 0) && (
+                        <span className="text-xs bg-ramadan-gold/20 text-ramadan-gold px-2 py-1 rounded border border-ramadan-gold/30">
+                            Current Overall: Page {dailyStats.current_max_quran_page}
+                        </span>
+                    )}
                 </label>
                 <div className="grid lg:grid-cols-2 gap-8 bg-ramadan-navy/30 p-6 rounded-xl border border-ramadan-gold/10">
                     {/* Juz Section */}
@@ -224,6 +246,12 @@ export default function DailyChecklist({ memberId, memberName, memberPhoto, sele
                                     <Plus className="w-5 h-5" />
                                 </button>
                             </div>
+                            {formData.quran_juz > (dailyStats?.starting_quran_juz || 0) && (
+                                <div className="text-xs text-ramadan-gold font-bold bg-ramadan-gold/10 px-3 py-1 rounded-full animate-fade-in flex items-center gap-1">
+                                    <Star className="w-3 h-3" />
+                                    +{(formData.quran_juz - (dailyStats?.starting_quran_juz ?? 0))} Juz today
+                                </div>
+                            )}
                             <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Total Juz: 30</div>
                         </div>
                     </div>
@@ -259,6 +287,13 @@ export default function DailyChecklist({ memberId, memberName, memberPhoto, sele
                                     <Plus className="w-5 h-5" />
                                 </button>
                             </div>
+
+                            {formData.quran_page > (dailyStats?.starting_quran_page || 0) && (
+                                <div className="text-xs text-ramadan-teal font-bold bg-ramadan-teal/10 px-3 py-1 rounded-full animate-fade-in flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    +{formData.quran_page - (dailyStats?.starting_quran_page ?? 0)} pages today
+                                </div>
+                            )}
 
                             {/* Quick Add Page Buttons */}
                             <div className="flex flex-wrap justify-center gap-2">

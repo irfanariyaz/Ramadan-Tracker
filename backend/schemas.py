@@ -133,6 +133,10 @@ class DailyEntryResponse(BaseModel):
     taraweeh: bool
     quran_juz: int
     quran_page: int
+    starting_quran_juz: int = 0
+    starting_quran_page: int = 0
+    current_max_quran_juz: int = 0
+    current_max_quran_page: int = 0
     daily_goal: Optional[str]
     custom_items: Optional[Dict[str, bool]]
     created_at: datetime
@@ -211,6 +215,7 @@ class LeaderboardEntry(BaseModel):
     photo_path: Optional[str]
     total_score: float
     fasting_streak: int
+    quran_streak: int
     fasting_total: int
     quran_pages_total: int
 

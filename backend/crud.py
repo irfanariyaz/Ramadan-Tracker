@@ -202,3 +202,31 @@ def cache_prayer_times(db: Session, entry_date: date, location_key: str, prayer_
     db.commit()
     db.refresh(db_cache)
     return db_cache
+
+
+def get_latest_daily_entry_before(db: Session, member_id: int, before_date: date):
+    """Get the most recent daily entry for a member before a specific date"""
+    return db.query(models.DailyEntry).filter(
+        models.DailyEntry.member_id == member_id,
+        models.DailyEntry.date < before_date
+    ).order_by(models.DailyEntry.date.desc()).first()
+
+
+def get_latest_quran_entry_before(db: Session, member_id: int, before_date: date):
+    """Get the most recent daily entry with non-zero Quran progress for a member before a specific date"""
+    return db.query(models.DailyEntry).filter(
+        models.DailyEntry.member_id == member_id,
+        models.DailyEntry.date < before_date,
+        models.DailyEntry.quran_page > 0
+    ).order_by(models.DailyEntry.date.desc()).first()
+
+
+def get_max_quran_progress(db: Session, member_id: int):
+    """Get the highest recorded Quran page for a member"""
+    try:
+        max_entry = db.query(models.DailyEntry).filter(
+            models.DailyEntry.member_id == member_id
+        ).order_by(models.DailyEntry.quran_page.desc()).first()
+        return max_entry
+    except:
+        return None

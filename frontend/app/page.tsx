@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Moon, Users, Calendar, Settings, UserPlus } from 'lucide-react';
+import { Moon, Users, Calendar, Settings, UserPlus, Trophy } from 'lucide-react';
 import { familyAPI, memberAPI, API_BASE_URL, normalizePhotoPath } from '@/lib/api';
 import DailyChecklist from '@/components/DailyChecklist';
 import IftarCountdown from '@/components/IftarCountdown';
@@ -11,7 +11,14 @@ import CustomItemsManager from '@/components/CustomItemsManager';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Home() {
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+function HomePageContent() {
+    const searchParams = useSearchParams();
+    const urlFamilyId = searchParams.get('familyId');
+    const urlMemberId = searchParams.get('memberId');
+
     const [selectedFamilyId, setSelectedFamilyId] = useState<number | null>(null);
     const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
     const getTodayLocal = () => {
@@ -36,10 +43,21 @@ export default function Home() {
         enabled: !!selectedFamilyId,
     });
 
+    // Auto-select from URL params
+    useEffect(() => {
+        if (urlFamilyId) {
+            setSelectedFamilyId(Number(urlFamilyId));
+        }
+        if (urlMemberId) {
+            setSelectedMemberId(Number(urlMemberId));
+        }
+    }, [urlFamilyId, urlMemberId]);
+
     // Auto-select first family if available, and validate selection
     useEffect(() => {
         if (families && families.length > 0) {
             if (!selectedFamilyId) {
+                // If no family selected manually or via URL, pick the first one
                 setSelectedFamilyId(families[0].id);
             } else {
                 // Check if currently selected family still exists
@@ -54,6 +72,16 @@ export default function Home() {
             setSelectedMemberId(null);
         }
     }, [families, selectedFamilyId]);
+
+    // Validate that the selected member belongs to the selected family
+    useEffect(() => {
+        if (selectedMemberId && members && members.length > 0) {
+            const memberExists = members.some(m => m.id === selectedMemberId);
+            if (!memberExists) {
+                setSelectedMemberId(null);
+            }
+        }
+    }, [members, selectedMemberId]);
 
     return (
         <main className="min-h-screen p-4 md:p-8">
@@ -117,9 +145,6 @@ export default function Home() {
 
                     </div>
 
-
-
-
                     {/* Date Picker */}
                     {selectedMemberId && (
                         <div className="mt-4">
@@ -139,12 +164,20 @@ export default function Home() {
 
                     <div className="mt-4 flex flex-wrap gap-3 justify-center">
                         {selectedFamilyId && (
-                            <Link href={`/dashboard?familyId=${selectedFamilyId}`}>
-                                <button className="btn-secondary">
-                                    <Users className="inline w-4 h-4 mr-2" />
-                                    View Family Dashboard
-                                </button>
-                            </Link>
+                            <div className="flex gap-3">
+                                <Link href={`/dashboard?familyId=${selectedFamilyId}`}>
+                                    <button className="btn-secondary">
+                                        <Users className="inline w-4 h-4 mr-2" />
+                                        View Dashboard
+                                    </button>
+                                </Link>
+                                <Link href={`/leaderboard?familyId=${selectedFamilyId}`}>
+                                    <button className="btn-secondary">
+                                        <Trophy className="inline w-4 h-4 mr-2 text-ramadan-gold" />
+                                        Leaderboard
+                                    </button>
+                                </Link>
+                            </div>
                         )}
                         {selectedMemberId && (
                             <button
@@ -266,5 +299,17 @@ export default function Home() {
                 )}
             </div>
         </main >
+    );
+}
+
+export default function Home() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <Moon className="w-12 h-12 text-ramadan-gold animate-pulse" />
+            </div>
+        }>
+            <HomePageContent />
+        </Suspense>
     );
 }

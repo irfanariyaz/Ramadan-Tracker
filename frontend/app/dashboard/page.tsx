@@ -107,107 +107,113 @@ function DashboardContent() {
                 {familyProgress && familyProgress.members.length > 0 ? (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {familyProgress?.members?.map((member) => (
-                            <div key={member.member_id} className="card animate-slide-up hover:shadow-glow-strong transition-all">
-                                {/* Member Header */}
-                                <div className="flex items-center gap-4 mb-6">
-                                    {member.photo_path ? (
-                                        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-ramadan-gold shrink-0">
-                                            <Image
-                                                src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)?.startsWith('/') ? normalizePhotoPath(member.photo_path)?.slice(1) : normalizePhotoPath(member.photo_path)}`}
-                                                alt={member.member_name}
-                                                fill
-                                                sizes="(max-width: 768px) 64px, 80px"
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="w-16 h-16 rounded-full bg-ramadan-navy/50 border-2 border-ramadan-gold/30 flex items-center justify-center">
-                                            <Users className="w-8 h-8 text-ramadan-gold/50" />
-                                        </div>
-                                    )}
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white">{member.member_name}</h3>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <Utensils className="w-4 h-4 text-ramadan-teal" />
-                                            <span className={`text-sm font-medium ${member.fasting_status === 'fasting' ? 'text-ramadan-teal' :
-                                                member.fasting_status === 'excused' ? 'text-ramadan-gold-light' :
-                                                    'text-gray-400'
-                                                }`}>
-                                                {member.fasting_status.replace('_', ' ').charAt(0).toUpperCase() +
-                                                    member.fasting_status.slice(1).replace('_', ' ')}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Progress Stats */}
-                                <div className={`grid grid-cols-2 ${member.custom_items_total > 0 ? 'md:grid-cols-3' : ''} gap-4 mb-4`}>
-                                    {/* Prayers */}
-                                    <div className="bg-ramadan-navy/50 rounded-lg p-4 text-center">
-                                        <div className="text-3xl font-bold text-ramadan-teal">
-                                            {member.prayers_completed}/6
-                                        </div>
-                                        <div className="text-xs text-gray-400 mt-1">Prayers</div>
-                                        <div className="w-full bg-ramadan-dark/50 rounded-full h-2 mt-2">
-                                            <div
-                                                className="bg-gradient-to-r from-ramadan-teal to-ramadan-teal/70 h-2 rounded-full transition-all duration-500"
-                                                style={{ width: `${(member.prayers_completed / 6) * 100}%` }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Quran */}
-                                    <div className="bg-ramadan-navy/50 rounded-lg p-4 text-center">
-                                        <div className="text-3xl font-bold text-ramadan-gold">
-                                            {member.quran_progress}%
-                                        </div>
-                                        <div className="text-xs text-gray-400 mt-1">Quran</div>
-                                        <div className="w-full bg-ramadan-dark/50 rounded-full h-2 mt-2">
-                                            <div
-                                                className="bg-gold-gradient h-2 rounded-full transition-all duration-500"
-                                                style={{ width: `${member.quran_progress}%` }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Custom Items */}
-                                    {member.custom_items_total > 0 && (
-                                        <div className="bg-ramadan-navy/50 rounded-lg p-4 text-center">
-                                            <div className="text-3xl font-bold text-ramadan-purple">
-                                                {member.custom_items_completed}/{member.custom_items_total}
+                            <Link
+                                key={member.member_id}
+                                href={`/?familyId=${familyId}&memberId=${member.member_id}`}
+                                className="block group"
+                            >
+                                <div className="card h-full animate-slide-up hover:shadow-glow-strong transition-all cursor-pointer group-hover:border-ramadan-teal/40">
+                                    {/* Member Header */}
+                                    <div className="flex items-center gap-4 mb-6">
+                                        {member.photo_path ? (
+                                            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-ramadan-gold shrink-0 group-hover:border-ramadan-teal transition-colors">
+                                                <Image
+                                                    src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)?.startsWith('/') ? normalizePhotoPath(member.photo_path)?.slice(1) : normalizePhotoPath(member.photo_path)}`}
+                                                    alt={member.member_name}
+                                                    fill
+                                                    sizes="(max-width: 768px) 64px, 80px"
+                                                    className="object-cover"
+                                                />
                                             </div>
-                                            <div className="text-xs text-gray-400 mt-1">Checklist</div>
+                                        ) : (
+                                            <div className="w-16 h-16 rounded-full bg-ramadan-navy/50 border-2 border-ramadan-gold/30 flex items-center justify-center group-hover:border-ramadan-teal transition-colors">
+                                                <Users className="w-8 h-8 text-ramadan-gold/50 group-hover:text-ramadan-teal/50" />
+                                            </div>
+                                        )}
+                                        <div>
+                                            <h3 className="text-xl font-bold text-white group-hover:text-ramadan-teal transition-colors">{member.member_name}</h3>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <Utensils className="w-4 h-4 text-ramadan-teal" />
+                                                <span className={`text-sm font-medium ${member.fasting_status === 'fasting' ? 'text-ramadan-teal' :
+                                                    member.fasting_status === 'excused' ? 'text-ramadan-gold-light' :
+                                                        'text-gray-400'
+                                                    }`}>
+                                                    {member.fasting_status.replace('_', ' ').charAt(0).toUpperCase() +
+                                                        member.fasting_status.slice(1).replace('_', ' ')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Progress Stats */}
+                                    <div className={`grid grid-cols-2 ${member.custom_items_total > 0 ? 'md:grid-cols-3' : ''} gap-4 mb-4`}>
+                                        {/* Prayers */}
+                                        <div className="bg-ramadan-navy/50 rounded-lg p-4 text-center">
+                                            <div className="text-3xl font-bold text-ramadan-teal">
+                                                {member.prayers_completed}/6
+                                            </div>
+                                            <div className="text-xs text-gray-400 mt-1">Prayers</div>
                                             <div className="w-full bg-ramadan-dark/50 rounded-full h-2 mt-2">
                                                 <div
-                                                    className="bg-gradient-to-r from-ramadan-purple to-ramadan-purple/70 h-2 rounded-full transition-all duration-500"
-                                                    style={{ width: `${(member.custom_items_completed / member.custom_items_total) * 100}%` }}
+                                                    className="bg-gradient-to-r from-ramadan-teal to-ramadan-teal/70 h-2 rounded-full transition-all duration-500"
+                                                    style={{ width: `${(member.prayers_completed / 6) * 100}%` }}
                                                 />
                                             </div>
                                         </div>
-                                    )}
-                                </div>
 
-                                {/* Daily Goal */}
-                                {member.daily_goal && (
-                                    <div className="bg-ramadan-purple/20 border border-ramadan-purple/30 rounded-lg p-3">
-                                        <div className="flex items-start gap-2">
-                                            <Trophy className="w-4 h-4 text-ramadan-gold-light mt-0.5 flex-shrink-0" />
-                                            <div>
-                                                <div className="text-xs text-ramadan-gold-light font-medium mb-1">
-                                                    Today's Goal
-                                                </div>
-                                                <p className="text-sm text-gray-300">{member.daily_goal}</p>
+                                        {/* Quran */}
+                                        <div className="bg-ramadan-navy/50 rounded-lg p-4 text-center">
+                                            <div className="text-3xl font-bold text-ramadan-gold">
+                                                {member.quran_progress}%
+                                            </div>
+                                            <div className="text-xs text-gray-400 mt-1">Quran</div>
+                                            <div className="w-full bg-ramadan-dark/50 rounded-full h-2 mt-2">
+                                                <div
+                                                    className="bg-gold-gradient h-2 rounded-full transition-all duration-500"
+                                                    style={{ width: `${member.quran_progress}%` }}
+                                                />
                                             </div>
                                         </div>
-                                    </div>
-                                )}
 
-                                {!member.daily_goal && (
-                                    <div className="bg-ramadan-navy/30 rounded-lg p-3 text-center">
-                                        <p className="text-xs text-gray-400">No goal set today</p>
+                                        {/* Custom Items */}
+                                        {member.custom_items_total > 0 && (
+                                            <div className="bg-ramadan-navy/50 rounded-lg p-4 text-center">
+                                                <div className="text-3xl font-bold text-ramadan-purple">
+                                                    {member.custom_items_completed}/{member.custom_items_total}
+                                                </div>
+                                                <div className="text-xs text-gray-400 mt-1">Checklist</div>
+                                                <div className="w-full bg-ramadan-dark/50 rounded-full h-2 mt-2">
+                                                    <div
+                                                        className="bg-gradient-to-r from-ramadan-purple to-ramadan-purple/70 h-2 rounded-full transition-all duration-500"
+                                                        style={{ width: `${(member.custom_items_completed / member.custom_items_total) * 100}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
+
+                                    {/* Daily Goal */}
+                                    {member.daily_goal && (
+                                        <div className="bg-ramadan-purple/20 border border-ramadan-purple/30 rounded-lg p-3">
+                                            <div className="flex items-start gap-2">
+                                                <Trophy className="w-4 h-4 text-ramadan-gold-light mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <div className="text-xs text-ramadan-gold-light font-medium mb-1">
+                                                        Today's Goal
+                                                    </div>
+                                                    <p className="text-sm text-gray-300">{member.daily_goal}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {!member.daily_goal && (
+                                        <div className="bg-ramadan-navy/30 rounded-lg p-3 text-center">
+                                            <p className="text-xs text-gray-400">No goal set today</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </Link>
                         ))}
                     </div>
                 ) : (

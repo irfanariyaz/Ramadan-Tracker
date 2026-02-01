@@ -217,8 +217,19 @@ def get_daily_stats(member_id: int, entry_date: date = None, db: Session = Depen
         entry_date = date.today()
     
     db_entry = crud.get_daily_entry(db, member_id, entry_date)
+    
+    # Get latest progress before this date for carry-over baseline
+    prev_entry = crud.get_latest_quran_entry_before(db, member_id, entry_date)
+    starting_juz = prev_entry.quran_juz if prev_entry else 0
+    starting_page = prev_entry.quran_page if prev_entry else 0
+
+    # Get global max progress for reference
+    max_entry = crud.get_max_quran_progress(db, member_id)
+    global_max_juz = max_entry.quran_juz if max_entry else 0
+    global_max_page = max_entry.quran_page if max_entry else 0
+
     if not db_entry:
-        # Return default entry if none exists
+        # Return default entry if none exists, with carry-over values
         return schemas.DailyEntryResponse(
             id=0,
             member_id=member_id,
@@ -230,14 +241,31 @@ def get_daily_stats(member_id: int, entry_date: date = None, db: Session = Depen
             maghrib=False,
             isha=False,
             taraweeh=False,
-            quran_juz=0,
-            quran_page=0,
+            quran_juz=starting_juz,
+            quran_page=starting_page,
+            starting_quran_juz=starting_juz,
+            starting_quran_page=starting_page,
+            current_max_quran_juz=global_max_juz,
+            current_max_quran_page=global_max_page,
             daily_goal=None,
             custom_items={},
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
-    return db_entry
+    
+    response = schemas.DailyEntryResponse.model_validate(db_entry)
+    response.starting_quran_juz = starting_juz
+    response.starting_quran_page = starting_page
+    response.current_max_quran_juz = global_max_juz
+    response.current_max_quran_page = global_max_page
+    
+    # If the user has an entry but hasn't updated Quran yet today (both 0),
+    # we show the carry-over values as current to prevent a "reset" UI experience.
+    if response.quran_juz == 0 and response.quran_page == 0:
+        response.quran_juz = starting_juz
+        response.quran_page = starting_page
+        
+    return response
 
 
 @app.post("/api/update-entry", response_model=schemas.DailyEntryResponse)
@@ -252,7 +280,53 @@ def update_entry(
     if not db_member:
         raise HTTPException(status_code=404, detail="Member not found")
     
-    return crud.update_daily_entry(db, member_id, entry_date, entry)
+    # 1. Capture old value for cascade calculation
+    old_entry = crud.get_daily_entry(db, member_id, entry_date)
+    old_page = old_entry.quran_page if old_entry else 0
+    old_juz = old_entry.quran_juz if old_entry else 0
+
+    # 2. Perform the update
+    db_entry = crud.update_daily_entry(db, member_id, entry_date, entry)
+    
+    # 3. Calculate delta if Quran was updated
+    new_page = db_entry.quran_page
+    new_juz = db_entry.quran_juz
+    page_delta = new_page - old_page
+    juz_delta = new_juz - old_juz
+
+    # 4. Cascade to future entries if there's a change
+    if page_delta != 0 or juz_delta != 0:
+        future_entries = db.query(models.DailyEntry).filter(
+            models.DailyEntry.member_id == member_id,
+            models.DailyEntry.date > entry_date
+        ).all()
+        
+        for f_entry in future_entries:
+            f_entry.quran_page += page_delta
+            f_entry.quran_juz += juz_delta
+            # Clamp juz to 30
+            if f_entry.quran_juz > 30: f_entry.quran_juz = 30
+            if f_entry.quran_juz < 0: f_entry.quran_juz = 0
+            # Pages should not be negative
+            if f_entry.quran_page < 0: f_entry.quran_page = 0
+        
+        db.commit()
+
+    # Return with carry-over meta and global max
+    prev_entry = crud.get_latest_quran_entry_before(db, member_id, entry_date)
+    starting_juz = prev_entry.quran_juz if prev_entry else 0
+    starting_page = prev_entry.quran_page if prev_entry else 0
+    
+    max_entry = crud.get_max_quran_progress(db, member_id)
+    global_max_juz = max_entry.quran_juz if max_entry else 0
+    global_max_page = max_entry.quran_page if max_entry else 0
+
+    response = schemas.DailyEntryResponse.model_validate(db_entry)
+    response.starting_quran_juz = starting_juz
+    response.starting_quran_page = starting_page
+    response.current_max_quran_juz = global_max_juz
+    response.current_max_quran_page = global_max_page
+    return response
 
 
 # Family Progress Endpoint
@@ -375,6 +449,13 @@ def get_monthly_stats(family_id: int, month: str = None, db: Session = Depends(g
 
     stats = []
     
+    # Initialize baselines for quran progress
+    member_baselines = {}
+    first_day_of_month = date(year, month_num, 1)
+    for member in members:
+        prev_entry = crud.get_latest_daily_entry_before(db, member.id, first_day_of_month)
+        member_baselines[member.id] = prev_entry.quran_page if prev_entry else 0
+
     # Iterate through each day of the month
     for day in range(1, num_days + 1):
         current_date = date(year, month_num, day)
@@ -416,6 +497,23 @@ def get_monthly_stats(family_id: int, month: str = None, db: Session = Depends(g
             # Daily Goal (5 pts)
             if entry.daily_goal:
                 score += 5
+                
+            # Quran Scoring (Daily Gain)
+            # Find previous page for this member to calculate delta
+            member_id = entry.member_id
+            current_page = entry.quran_page or 0
+            
+            # Use the running tracker for previous page, or baseline if first time
+            prev_page = member_baselines.get(member_id, 0)
+            if current_page > prev_page:
+                delta = current_page - prev_page
+                quran_reward = 10 if member_details.role == "child" else 2
+                score += (delta * quran_reward)
+            
+            # Update running tracker for next day
+            # Only update if current_page > 0 to avoid resetting baseline if entry is missing quran
+            if current_page > 0:
+                member_baselines[member_id] = max(prev_page, current_page)
                 
             daily_total_score += score
 
@@ -462,19 +560,56 @@ def get_leaderboard(family_id: int, db: Session = Depends(get_db)):
         max_quran_page = 0
         
         # Calculate streaks and totals
-        # Sort entries by date
         sorted_entries = sorted(entries, key=lambda x: x.date)
         
-        streak_counter = 0
+        fasting_streak = 0
+        quran_streak = 0
+        fasting_total = 0
+        
+        # Fasting streak (Existing logic)
+        temp_fast_streak = 0
         for entry in sorted_entries:
             if entry.fasting_status == "fasting":
-                streak_counter += 1
+                temp_fast_streak += 1
                 fasting_total += 1
+            elif entry.fasting_status != "excused":
+                temp_fast_streak = 0
+        fasting_streak = temp_fast_streak
+
+        # Quran Reading Streak (Strict consecutive days)
+        today = date.today() 
+        
+        # We need to know which dates had a page GAIN
+        # Sort ascending to find gains reliably
+        asc_entries = sorted(entries, key=lambda x: x.date)
+        gains = []
+        last_p = 0
+        for e in asc_entries:
+            # A day counts if pages were read/advanced
+            if e.quran_page > last_p:
+                gains.append(e.date)
+                last_p = e.quran_page
+        
+        if gains:
+            # Sort descending to walk back from most recent gain
+            gains.sort(reverse=True)
+            
+            # Streak is 'active' if most recent gain was today or yesterday
+            # (Allows for timezone differences and late-night logging)
+            if (today - gains[0]).days <= 1:
+                q_count = 1
+                for i in range(len(gains) - 1):
+                    # Check if the next gap is exactly 1 day
+                    if (gains[i] - gains[i+1]).days == 1:
+                        q_count += 1
+                    else:
+                        break
+                quran_streak = q_count
             else:
-                # partial streak reset logic or strict? Simple strict logic:
-                if entry.fasting_status != "excused":
-                   streak_counter = 0
-        current_streak = streak_counter
+                # If last reading was > 1 day ago, the streak is currently 0
+                quran_streak = 0
+        else:
+            quran_streak = 0
         
         # Calculate Score
         for entry in entries:
@@ -512,7 +647,8 @@ def get_leaderboard(family_id: int, db: Session = Depends(get_db)):
             role=member.role,
             photo_path=member.photo_path,
             total_score=total_score,
-            fasting_streak=current_streak,
+            fasting_streak=fasting_streak,
+            quran_streak=quran_streak,
             fasting_total=fasting_total,
             quran_pages_total=max_quran_page
         ))
