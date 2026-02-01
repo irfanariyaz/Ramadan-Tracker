@@ -6,7 +6,7 @@ from PIL import Image
 import io
 
 
-UPLOAD_DIR = Path("static/photos")
+UPLOAD_DIR = Path(__file__).parent / "static" / "photos"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}

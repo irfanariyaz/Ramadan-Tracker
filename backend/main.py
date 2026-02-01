@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 from typing import List
 import os
 import calendar
+from pathlib import Path
 
 import models
 import schemas
@@ -21,10 +22,12 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Ramadan Daily Tracker API")
 
 # Create static directory for photos
-os.makedirs("static/photos", exist_ok=True)
+STATIC_DIR = Path(__file__).parent / "static"
+PHOTO_DIR = STATIC_DIR / "photos"
+os.makedirs(PHOTO_DIR, exist_ok=True)
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # CORS middleware
 allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001").split(",")
