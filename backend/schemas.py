@@ -59,7 +59,11 @@ class MemberResponse(BaseModel):
     @field_validator('photo_path', mode='after')
     @classmethod
     def normalize_photo_path(cls, v: Optional[str]) -> Optional[str]:
-        if v and 'static/photo s/' in v:
+        if not v:
+            return v
+        if v.startswith('http'):
+            return v
+        if 'static/photo s/' in v:
             return v.replace('static/photo s/', 'static/photos/')
         return v
 
@@ -174,7 +178,11 @@ class MemberProgress(BaseModel):
     @field_validator('photo_path', mode='after')
     @classmethod
     def normalize_photo_path(cls, v: Optional[str]) -> Optional[str]:
-        if v and 'static/photo s/' in v:
+        if not v:
+            return v
+        if v.startswith('http'):
+            return v
+        if 'static/photo s/' in v:
             return v.replace('static/photo s/', 'static/photos/')
         return v
 
@@ -222,7 +230,11 @@ class LeaderboardEntry(BaseModel):
     @field_validator('photo_path', mode='after')
     @classmethod
     def normalize_photo_path(cls, v: Optional[str]) -> Optional[str]:
-        if v and 'static/photo s/' in v:
+        if not v:
+            return v
+        if v.startswith('http'):
+            return v
+        if 'static/photo s/' in v:
             return v.replace('static/photo s/', 'static/photos/')
         return v
 
