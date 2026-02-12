@@ -7,6 +7,10 @@ from typing import List
 import os
 import calendar
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 import models
 import schemas

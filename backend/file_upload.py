@@ -5,7 +5,10 @@ from pathlib import Path
 from PIL import Image
 import io
 from supabase import create_client, Client
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
 
 UPLOAD_DIR = Path(__file__).parent / "static" / "photos"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -22,9 +25,23 @@ supabase_client: Client = None
 if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
     try:
         supabase_client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-        print("Supabase storage client initialized.")
+        print(f"Supabase storage client initialized with URL: {SUPABASE_URL}")
+        
+        # Verify bucket access
+        try:
+            buckets = supabase_client.storage.list_buckets()
+            bucket_names = [b.name for b in buckets]
+            if SUPABASE_BUCKET not in bucket_names:
+                print(f"WARNING: Supabase bucket '{SUPABASE_BUCKET}' not found. Available buckets: {bucket_names}")
+            else:
+                print(f"Verified access to Supabase bucket: {SUPABASE_BUCKET}")
+        except Exception as bucket_err:
+            print(f"Could not verify Supabase buckets: {bucket_err}")
+            
     except Exception as e:
         print(f"Error initializing Supabase client: {e}")
+else:
+    print("Supabase credentials missing. Falling back to local storage.")
 
 
 async def save_upload_file(upload_file: UploadFile) -> str:
@@ -63,17 +80,23 @@ async def save_upload_file(upload_file: UploadFile) -> str:
     if supabase_client:
         try:
             # Upload to Supabase
-            supabase_client.storage.from_(SUPABASE_BUCKET).upload(
+            print(f"Attempting Supabase upload to bucket: {SUPABASE_BUCKET}")
+            response = supabase_client.storage.from_(SUPABASE_BUCKET).upload(
                 path=unique_filename,
                 file=contents,
                 file_options={"content-type": upload_file.content_type}
             )
+            
+            # The supabase-py client sometimes returns the path in the response
+            # or might raise an exception if it fails.
+            
             # Get Public URL
             public_url = supabase_client.storage.from_(SUPABASE_BUCKET).get_public_url(unique_filename)
-            print(f"File uploaded to Supabase: {public_url}")
+            print(f"File uploaded to Supabase successfully: {public_url}")
             return public_url
         except Exception as e:
-            print(f"Supabase upload failed, falling back to local: {e}")
+            print(f"Supabase upload failed: {e}")
+            print(f"Falling back to local storage for: {unique_filename}")
             # Fallback to local if upload fails
 
     # --- DEV/FALLBACK: Local Storage ---
