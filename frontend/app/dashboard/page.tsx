@@ -118,7 +118,7 @@ function DashboardContent() {
                                         {member.photo_path ? (
                                             <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-ramadan-gold shrink-0 group-hover:border-ramadan-teal transition-colors">
                                                 <Image
-                                                    src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)?.startsWith('/') ? normalizePhotoPath(member.photo_path)?.slice(1) : normalizePhotoPath(member.photo_path)}`}
+                                                    src={normalizePhotoPath(member.photo_path) || ''}
                                                     alt={member.member_name}
                                                     fill
                                                     sizes="(max-width: 768px) 64px, 80px"
@@ -130,6 +130,7 @@ function DashboardContent() {
                                                 <Users className="w-8 h-8 text-ramadan-gold/50 group-hover:text-ramadan-teal/50" />
                                             </div>
                                         )}
+
                                         <div>
                                             <h3 className="text-xl font-bold text-white group-hover:text-ramadan-teal transition-colors">{member.member_name}</h3>
                                             <div className="flex items-center gap-2 mt-1">

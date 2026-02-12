@@ -306,7 +306,7 @@ function SettingsContent() {
                                                     <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-ramadan-gold/30 bg-ramadan-navy flex items-center justify-center">
                                                         {member.photo_path ? (
                                                             <img
-                                                                src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)}`}
+                                                                src={normalizePhotoPath(member.photo_path) || ''}
                                                                 alt={member.name}
                                                                 className="w-full h-full object-cover"
                                                                 onError={(e) => {
@@ -314,6 +314,7 @@ function SettingsContent() {
                                                                 }}
                                                             />
                                                         ) : (
+
                                                             <div className="text-ramadan-gold font-bold text-lg">
                                                                 {member.name.charAt(0).toUpperCase()}
                                                             </div>

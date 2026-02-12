@@ -3,9 +3,20 @@ export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhos
 // Utility to normalize photo paths (fixes legacy typos like "photo s" -> "photos")
 export const normalizePhotoPath = (path: string | null | undefined): string | null => {
     if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return path.replace('static/photo s/', 'static/photos/');
+
+    // Fix legacy typos
+    let normalized = path.replace('static/photo s/', 'static/photos/');
+
+    // If it's already an absolute URL (like Supabase), return it
+    if (normalized.startsWith('http')) return normalized;
+
+    // For local paths, prepend the API base URL and ensure correct slashing
+    const baseUrl = API_BASE_URL.replace(/\/$/, '');
+    const cleanPath = normalized.startsWith('/') ? normalized : `/${normalized}`;
+
+    return `${baseUrl}${cleanPath}`;
 };
+
 
 export const formatDate = (dateStr: string): string => {
     const [year, month, day] = dateStr.split('-').map(Number);

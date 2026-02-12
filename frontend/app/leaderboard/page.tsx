@@ -58,12 +58,13 @@ function LeaderboardContent() {
                             <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-ramadan-gold/50 mr-4">
                                 {entry.photo_path ? (
                                     <Image
-                                        src={`${API_BASE_URL}/${normalizePhotoPath(entry.photo_path)?.startsWith('/') ? normalizePhotoPath(entry.photo_path)?.slice(1) : normalizePhotoPath(entry.photo_path)}`}
+                                        src={normalizePhotoPath(entry.photo_path) || ''}
                                         alt={entry.member_name}
                                         fill
                                         sizes="48px"
                                         className="object-cover"
                                     />
+
                                 ) : (
                                     <div className="w-full h-full bg-ramadan-navy flex items-center justify-center text-ramadan-gold font-bold">
                                         {entry.member_name[0]}

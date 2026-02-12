@@ -119,7 +119,8 @@ export default function DailyChecklist({ memberId, memberName, memberPhoto, sele
                     {memberPhoto ? (
                         <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-ramadan-gold">
                             <Image
-                                src={`${API_BASE_URL}/${normalizePhotoPath(memberPhoto)?.startsWith('/') ? normalizePhotoPath(memberPhoto)?.slice(1) : normalizePhotoPath(memberPhoto)}`}
+                                src={normalizePhotoPath(memberPhoto) || ''}
+
                                 alt={memberName}
                                 fill
                                 sizes="64px"

@@ -68,8 +68,9 @@ export default function PhotoUpload({ memberId, currentPhotoPath }: PhotoUploadP
         setIsDragging(false);
     };
 
-    const normalizedPath = normalizePhotoPath(currentPhotoPath);
-    const photoUrl = preview || (normalizedPath ? `${API_BASE_URL}/${normalizedPath.startsWith('/') ? normalizedPath.slice(1) : normalizedPath}` : null);
+    const normalizedUrl = normalizePhotoPath(currentPhotoPath);
+    const photoUrl = preview || normalizedUrl;
+
 
     return (
         <div className="flex flex-col items-center gap-4">

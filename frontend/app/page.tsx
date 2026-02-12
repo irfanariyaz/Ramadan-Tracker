@@ -202,12 +202,13 @@ function HomePageContent() {
                                     {members?.find(m => m.id === selectedMemberId)?.photo_path ? (
                                         <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-ramadan-dark/20">
                                             <Image
-                                                src={`${API_BASE_URL}/${normalizePhotoPath(members.find(m => m.id === selectedMemberId).photo_path)?.startsWith('/') ? normalizePhotoPath(members.find(m => m.id === selectedMemberId).photo_path)?.slice(1) : normalizePhotoPath(members.find(m => m.id === selectedMemberId).photo_path)}`}
+                                                src={normalizePhotoPath(members?.find(m => m.id === selectedMemberId)?.photo_path) || ''}
                                                 alt="Selected"
                                                 fill
                                                 sizes="48px"
                                                 className="object-cover"
                                             />
+
                                         </div>
                                     ) : (
                                         <div className="w-12 h-12 rounded-full bg-ramadan-dark/10 flex items-center justify-center border-2 border-ramadan-dark/20">
@@ -260,12 +261,13 @@ function HomePageContent() {
                                     <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-transparent group-hover:border-ramadan-gold bg-ramadan-navy/50 flex items-center justify-center transition-all shadow-lg group-hover:shadow-glow-gold">
                                         {member.photo_path ? (
                                             <Image
-                                                src={`${API_BASE_URL}/${normalizePhotoPath(member.photo_path)?.startsWith('/') ? normalizePhotoPath(member.photo_path)?.slice(1) : normalizePhotoPath(member.photo_path)}`}
+                                                src={normalizePhotoPath(member.photo_path) || ''}
                                                 alt={member.name}
                                                 fill
                                                 sizes="96px"
                                                 className="object-cover"
                                             />
+
                                         ) : (
                                             <Users className="w-10 h-10 text-ramadan-gold/50" />
                                         )}
