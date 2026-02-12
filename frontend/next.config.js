@@ -10,11 +10,17 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'ramadan-tracker.onrender.com',
+                hostname: '**.onrender.com',
                 pathname: '/static/**',
+            },
+            {
+                protocol: 'https',
+                hostname: '**.supabase.co',
+                pathname: '/storage/v1/object/public/**',
             },
         ],
     },
+
 };
 
 module.exports = nextConfig;
